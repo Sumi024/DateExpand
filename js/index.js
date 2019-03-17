@@ -2,10 +2,10 @@
  * creater : Sumi
  * time: 2018/10/17
  */
+// TODO reCode to Object.defineProperty
 
 Date.prototype.toLocalTime = toLocalTime;
 Date.prototype.getTimeZone = getTimeZone;
-Date.prototype.translateTime = translateTime;
 Date.prototype.format = format;
 
 const map = {
@@ -47,15 +47,28 @@ const map = {
     }
 };
 
-function toLocalTime(date,status){
+/*
+ * 解决一个本地时与国际时(UTC)的转换
+ * date: Date 类型,format 输出格式 'yyyy-MM-dd hh:mm:ss', status : boolean 类型(true:UTC转local,false:local转UTC)
+ * TODO 支持Date类型输出 format='Date'
+ * TODO 支持输出h5 input value格式的值
+ */
+
+function toLocalTime(date,format,status){
     // Format yyyy-mm-dd hh:mm:ss
     var timeZone = Number(getTimeZone()) * 10 * 60 * 60;
     if(status){
         timeZone = - timeZone;
     }
     date = new Date(Number(date) + timeZone);
-    return date.getFullYear().nString(4) + '-' + (date.getMonth() + 1).nString(2) + '-' + date.getDate().nString(2) + ' ' + date.getHours().nString(2) + ':' + date.getMinutes().nString(2) + ':' + date.getSeconds().nString(2);
+    return date.format(format);
 }
+
+// TODO 能支持字符串按特定格式转成Date类型的方法，例如 'yyyy-MM-dd hh:mm:ss' => Date Object;
+
+/*
+ * 获取当地时区
+ */
 
 function getTimeZone(){
     var reg = /(?:GMT)([\+\-0-9]+)/i;
@@ -63,16 +76,10 @@ function getTimeZone(){
     return time.match(reg)[1];
 }
 
-function translateTime(date){
-    // Format yyyy-mm-dd hh:mm:ss
-    return data.replace(/\-+/g, '/');
-}
-
-
 /*
- * 通过类似注解的形式，处理时间输出的模式
+ * 通过指定的形式，处理时间字串化输出的值
  * 如：format => yyyy-MM-dd hh-mm-ss , output => 2018-10-17 17:02:03
- * 默认注解字段: 年 => y, 月 => m, 天 => d, 时 => h, 分 => m, 秒 => s
+ * 默认字段: 年 => y, 月 => M, 天 => d, 时 => h, 分 => m, 秒 => s
  */
 function format(format){
     var _this = this;
